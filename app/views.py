@@ -130,14 +130,14 @@ def giveHigh5(team_name, user_name):
                           level=level, team=team)
         app_db.session.add(new_high5)
         app_db.session.commit()
-        return redirect('/notify/' + user_name + '/' + team_name + '/' + '/' + receiver + '/' + message)
+        return redirect('/notify/' + user_name + '/' + team_name + '/' + receiver + '/' + message)
     return render_template('giveHigh5.html', team=team, user=user_name, form=form)
 
 """Send an email notification to the receiver of a new High5. Gets called from the GiveHigh5 page and sends an email from
  the admin account to the receiver with the giver's name and contents of the message. Returns the user who gave the
  high5 to the team page."""
 
-@app.route('/notify/<user_name>/<team_name>/<receiver_name>/<message>')
+@app.route('/notify/<user_name>/<team_name>/<receiver_name>/<message>', methods=['GET', 'POST'])
 @login_required
 def follow(user_name, team_name, receiver_name, message):
     receiver = User.query.filter(User.user_name == receiver_name).first()
