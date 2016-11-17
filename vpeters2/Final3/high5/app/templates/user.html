@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900|Quicksand:400,700|Questrial" rel="stylesheet" />
+    <link href="/static/default.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="/static/fonts.css" rel="stylesheet" type="text/css" media="all" />
+
+    <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+<body>
+<div id="header-wrapper">
+    <div id="header" class="container">
+        <div id="logo">
+            <h1><span class="icon icon-star"></span><a href="/team/{{ user }}/{{ team.get_name() }}">{{ team.get_name() }}</a></h1>
+            <div id="menu">
+                <ul>
+                    <li><a href="/team/{{ user }}/{{ team.get_name() }}" accesskey="1" title="">Team Page</a></li>
+                    <li class="current_page_item"><a href="/user/{{ user }}/{{ team.get_name() }}" accesskey="2" title="">My High5's</a></li>
+                    <li><a href="/giveHigh5/{{ user }}/{{ team.get_name() }}" accesskey="3" title="">Give High5</a></li>
+                    <li><a href="/index/{{ user }}" accesskey="4" title="">Teams</a></li>
+                    <li><a href="/logout" accesskey="5" title="">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="page-wrapper">
+    <div id="page" class="container">
+        <div class="title">
+            <h2>{{ user }}</h2>
+        </div>
+        <p>See High5's you've earned from your teammates!</p>
+    </div>
+</div>
+<div class="wrapper">
+    <div class="container">
+        <ul class="high5">
+            <li>
+                <h2 class="high5_score">Total High5 Score: {{ score }}</h2>
+            </li>
+            {% for high5 in high5s %}
+            <li class="user_high5">
+                <span class="icon icon-star"><h3 class="high5_msg">{{ high5.get_message() }}</h3></span>
+                <p class="high5_dets">From: {{ high5.get_giver() }}
+                    <br>Date: {{ high5.get_time() }}
+                    <br>Level: {{ high5.get_level() }}
+                </p>
+            </li>
+            {% endfor %}
+            <li>
+                <h2 class="high5_score">High5's You've Given:</h2>
+            </li>
+            {% for high5 in myhigh5s %}
+            <li class="user_high5">
+                <span class="icon icon-star"><h3 class="high5_msg">{{ high5.get_message() }}</h3></span>
+                <p class="high5_dets">To: {{ high5.get_receiver() }}
+                    <br>Date: {{ high5.get_time() }}
+                    <br>Level: {{ high5.get_level() }}
+                    <br><a href="/editHigh5/{{ user }}/{{ team.get_name() }}/{{ high5.id }}" title="">Edit High5</a>
+                </p>
+            </li>
+            {% endfor %}
+        </ul></div>
+</div>
+
+<div id="copyright" class="container">
+    <p>&copy; Untitled. All rights reserved. | Photos by <a href="http://fotogrph.com/">Fotogrph</a> | Design by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>.</p>
+</div>
+</body>
+</html>
