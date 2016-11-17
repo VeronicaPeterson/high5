@@ -56,6 +56,8 @@ def register():
             app_db.session.commit()
             login_user(new_user)
             return redirect('/index/' + user_name)
+        else:
+            flash("User already exists with that user name or email.")
     return render_template('registration.html', form=form)
 
 """
@@ -109,7 +111,8 @@ def team(team_name, user_name):
                            top_receivers=top_receivers, top_scorers=top_scorers, top_givers=top_givers)
 
 
-"""Create the page for a user to give high5's to other teammates on the selected team. Add the new High5 to the db."""
+"""Create the page for a user to give high5's to other teammates on the selected team. Add the new High5 to the db.
+Make sure a user does not try to give themself a high5"""
 
 @app.route('/giveHigh5/<user_name>/<team_name>', methods=['GET', 'POST'])
 @login_required
@@ -118,19 +121,20 @@ def giveHigh5(team_name, user_name):
     form = High5Form()
     if form.validate_on_submit():
         receiver = form.receiver.data
-        message = form.message.data
-        level = form.level.data
-        if level < 1:
-            level = 1
-        elif level > 5:
-            level = 5
-        else:
-            level = level
-        new_high5 = High5(receiver=receiver, giver=user_name, message=message, time_posted=datetime.datetime.utcnow(),
-                          level=level, team=team)
-        app_db.session.add(new_high5)
-        app_db.session.commit()
-        return redirect('/notify/' + user_name + '/' + team_name + '/' + receiver + '/' + message)
+        if not (receiver == user_name):
+            message = form.message.data
+            level = form.level.data
+            if level < 1:
+                level = 1
+            elif level > 5:
+                level = 5
+            else:
+                level = level
+            new_high5 = High5(receiver=receiver, giver=user_name, message=message, time_posted=datetime.datetime.utcnow(),
+                              level=level, team=team)
+            app_db.session.add(new_high5)
+            app_db.session.commit()
+            return redirect('/notify/' + user_name + '/' + team_name + '/' + receiver + '/' + message)
     return render_template('giveHigh5.html', team=team, user=user_name, form=form)
 
 """Send an email notification to the receiver of a new High5. Gets called from the GiveHigh5 page and sends an email from
@@ -139,7 +143,7 @@ def giveHigh5(team_name, user_name):
 
 @app.route('/notify/<user_name>/<team_name>/<receiver_name>/<message>', methods=['GET', 'POST'])
 @login_required
-def follow(user_name, team_name, receiver_name, message):
+def notify(user_name, team_name, receiver_name, message):
     receiver = User.query.filter(User.user_name == receiver_name).first()
     high5_notif(receiver, user_name, message)
     return redirect('/team/' + user_name + '/' + team_name)
@@ -171,6 +175,7 @@ has the button for a user to delete a team. """
 def editTeam(team_name, user_name):
     team = Team.query.get(team_name)
     if not team.get_admin() == user_name:
+        flash("Cannot edit a team you are not admin for.")
         return redirect('/team/' + user_name + '/' + team_name)
     members = team.members.all()
     edit_form = EditTeamForm()
