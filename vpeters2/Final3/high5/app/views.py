@@ -10,6 +10,7 @@ from create_team_form import TeamForm
 from edit_team_form import EditTeamForm, RemoveMemberForm
 from high5_form import High5Form
 from edit_comment_form import EditCommentForm
+from emails import high5_notif
 
 """Create the app routes used in the app URL. Login is the main team page. Any page which cannot be visited until a
 user is logged in has the @login_required property."""
@@ -129,9 +130,19 @@ def giveHigh5(team_name, user_name):
                           level=level, team=team)
         app_db.session.add(new_high5)
         app_db.session.commit()
-        return redirect('/team/' + user_name + '/' + team_name)
+        return redirect('/notify/' + user_name + '/' + team_name + '/' + '/' + receiver + '/' + message)
     return render_template('giveHigh5.html', team=team, user=user_name, form=form)
 
+"""Send an email notification to the receiver of a new High5. Gets called from the GiveHigh5 page and sends an email from
+ the admin account to the receiver with the giver's name and contents of the message. Returns the user who gave the
+ high5 to the team page."""
+
+@app.route('/notify/<user_name>/<team_name>/<receiver_name>/<message>')
+@login_required
+def follow(user_name, team_name, receiver_name, message):
+    receiver = User.query.filter(User.user_name == receiver_name).first()
+    high5_notif(receiver, user_name, message)
+    return redirect('/team/' + user_name + '/' + team_name)
 
 """Create the user page, specific to the user and the selected team. Show the user's total
 high5 score and all received high5's starting with the most recent. Also list the high5's that a user has given and
