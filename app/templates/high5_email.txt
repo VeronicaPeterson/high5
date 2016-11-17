@@ -1,0 +1,11 @@
+Dear {{ receiver.get_user_name() }},
+
+{{ giver }} has given you the following High5:
+
+{{ message }}
+
+Visit your High5 user page to see the High5!
+
+Regards,
+
+Your High5 Admin
