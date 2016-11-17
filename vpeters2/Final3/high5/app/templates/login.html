@@ -37,7 +37,11 @@ Released for free under the Creative Commons Attribution License
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}<br>
                 </p>
-                <p>Password: {{ form.password(size=50, autocomplete="off") }}</p>
+                <p>Password: {{ form.password(size=50, autocomplete="off") }}
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}<br>
+                </p>
                 <p><input class="form_submit" type="submit" value="Login"></p>
             </form>
         </div>

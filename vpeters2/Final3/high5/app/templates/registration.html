@@ -21,12 +21,21 @@ Released for free under the Creative Commons Attribution License
 <div id="header-wrapper">
     <div id="header" class="container">
         <div id="logo">
-            <h1><span class="icon icon-star"></span><a href="">High5</a></h1>
+            <h1><span class="icon icon-star"></span><a href="/login">High5</a></h1>
         </div>
     </div>
 </div>
 <div id="page-wrapper">
     <div id="page" class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         <div class="title">
             <h2>Register</h2><br>
             <form action="" method="post" name="register">
