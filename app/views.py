@@ -84,7 +84,7 @@ def index(user_name):
         list(set(team_members))
         new_team = Team(name=team_name, admin=user_name)
         for team_member in team_members:
-            user1 = User.query.filter(User.user_name == team_member).one()
+            user1 = User.query.filter(User.user_name == team_member).first()
             if user1:
                 new_team.members.append(user1)
         app_db.session.add(new_team)
