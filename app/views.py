@@ -77,14 +77,15 @@ Also has a form for a user to create a new team with a team name and starting me
 def index(user_name):
     teams = Team.query.filter(Team.members.any(User.user_name == user_name)).order_by(Team.name).all()
     form = TeamForm()
+    form.team_members.choices = [(u.id, u.user_name) for u in User.query.filter(User.user_name != user_name).order_by('name')]
     if form.validate_on_submit():
         team_name = form.team_name.data
-        team_members = [x.strip() for x in form.team_members.data.split(',')]
-        team_members.append(user_name)
+        team_members = form.team_members.data
         list(set(team_members))
         new_team = Team(name=team_name, admin=user_name)
+        new_team.members.append(User.query.filter(User.user_name == user_name).first())
         for team_member in team_members:
-            user1 = User.query.filter(User.user_name == team_member).first()
+            user1 = User.query.get(team_member)
             if user1:
                 new_team.members.append(user1)
         app_db.session.add(new_team)
@@ -168,7 +169,8 @@ def user(team_name, user_name):
 This page can only be reached by the admin of the team. Any added users must exist in the Users table and cannot
 already exist in the team. Two forms exist for adding or removing members multiple at a time. If a user is removed from
 a team, the team page no longer includes any High5's that member received. This page also
-has the button for a user to delete a team. """
+has the button for a user to delete a team. Uses multiple selection fields to allow addition and removal of multiple
+users at a time."""
 
 @app.route('/edit/<user_name>/<team_name>', methods=['GET', 'POST'])
 @login_required
@@ -179,25 +181,30 @@ def editTeam(team_name, user_name):
         return redirect('/team/' + user_name + '/' + team_name)
     members = team.members.all()
     edit_form = EditTeamForm()
+    possible_to_add = [(u.id, u.user_name) for u in User.query.filter(User.user_name != user_name).order_by('name')]
+    definite_to_add = []
+    for uid,uname in possible_to_add:
+        if User.query.get(uid) not in members:
+            definite_to_add.append((uid,uname))
+    edit_form.users.choices = definite_to_add
     remove_member_form = RemoveMemberForm()
+    possible_to_remove = [(u.id, u.user_name) for u in User.query.filter(User.user_name != user_name).order_by('name')]
+    definite_to_remove = []
+    for uid,uname in possible_to_remove:
+        if User.query.get(uid) in members:
+            definite_to_remove.append((uid,uname))
+    remove_member_form.team_members.choices = definite_to_remove
     if edit_form.validate_on_submit():
-        team_members = [x.strip() for x in edit_form.users.data.split(',')]
-        list(set(team_members))
+        team_members = edit_form.users.data
         for team_member in team_members:
-            user1 = User.query.filter(User.user_name == team_member).first()
-            if user1 and user1 not in members:
-                team.members.append(user1)
+            team.members.append(User.query.get(team_member))
         app_db.session.commit()
         return redirect('/edit/' + user_name + '/' + team_name)
     if remove_member_form.validate_on_submit():
-        team_members = [x.strip() for x in remove_member_form.team_members.data.split(',')]
-        list(set(team_members))
+        team_members = remove_member_form.team_members.data
         for team_member in team_members:
-            if not (team_member == user_name):
-                user1 = User.query.filter(User.user_name == team_member).first()
-                if user1:
-                    team.members.remove(user1)
-                    High5.query.filter(High5.team_name==team_name).filter(High5.receiver==team_member).delete()
+            team.members.remove(User.query.get(team_member))
+            High5.query.filter(High5.team_name==team_name).filter(High5.receiver==team_member).delete()
         app_db.session.commit()
         return redirect('/edit/' + user_name + '/' + team_name)
     return render_template('editTeam.html', team=team, user=user_name, members=members,

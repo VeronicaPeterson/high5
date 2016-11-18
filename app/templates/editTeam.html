@@ -57,7 +57,7 @@ Released for free under the Creative Commons Attribution License
                 <h3 class="add_members">Remove Members</h3>
                 <form action="" method="post" name="remove_form">
                     {{ remove_member_form.hidden_tag() }}
-                    <p>Enter comma-separated user names to remove: <br>{{ remove_member_form.team_members(size=100) }}
+                    <p>Select members to remove: <br>{{ remove_member_form.team_members(size=5) }}
                     <p><input class="form_submit" type="submit" value="Remove Members"></p>
                 </form>
             </li>
@@ -65,7 +65,7 @@ Released for free under the Creative Commons Attribution License
                 <h3 class="add_members">Add Members</h3>
                 <form action="" method="post" name="add_members">
                     {{ edit_form.hidden_tag() }}
-                    <p>Enter comma-separated user names to add: <br>{{ edit_form.users(size=100) }}</p>
+                    <p>Select users to add: <br>{{ edit_form.users(size=5) }}</p>
                     <p><input class="form_submit" type="submit" value="Add Members"></p>
                 </form>
             </li>
