@@ -1,15 +1,15 @@
 from flask_wtf import Form
-from wtforms import StringField
+from wtforms import StringField, SelectMultipleField
 from wtforms.validators import DataRequired
 
 '''
-Add team members form. Requires user to enter a comma-separated list of usernames of members to add to the team.
+Add team members form. Requires user to select one or more usernames of members to add to the team.
 Only the team admin can add members.'''
 class EditTeamForm(Form):
-    users = StringField('users', validators=[DataRequired()])
+    users = SelectMultipleField(u'Add Members', coerce=int, validators=[DataRequired()])
 
 '''
-Remove team members form. Requires user to enter a comma-separated list of usernames of members to remove
+Remove team members form. Requires user to select one or more usernames of members to remove
 from the team. Only the team admin can remove members.'''
 class RemoveMemberForm(Form):
-    team_members = StringField('team_members', validators=[DataRequired()])
+    team_members = SelectMultipleField(u'Remove Members', coerce=int, validators=[DataRequired()])
